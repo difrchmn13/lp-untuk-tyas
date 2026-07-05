@@ -31,6 +31,13 @@
             color: white;
             border-color: #2563eb;
         }
+        @keyframes pulse-soft {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; transform: scale(0.98); }
+        }
+        .animate-pulse-soft {
+            animation: pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
     </style>
 </head>
 <body class="bg-gray-100 font-sans min-h-screen pb-64 overflow-x-hidden">
@@ -649,6 +656,28 @@
         </div>
     </div>
 
+    <div id="audit-modal" class="fixed inset-0 z-[80] hidden bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden transform scale-95 transition-transform duration-300" id="audit-content">
+            <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-red-600 text-white">
+                <h3 class="font-bold text-lg flex items-center">
+                    <i class="fa-solid fa-magnifying-glass-chart mr-2"></i> Analisis Selisih Shift
+                </h3>
+                <button onclick="closeAuditModal()" class="text-white/80 hover:text-white transition cursor-pointer">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="p-5 bg-gray-50 space-y-4 max-h-[70vh] overflow-y-auto" id="audit-body">
+                </div>
+            
+            <div class="p-4 bg-white border-t border-gray-200 text-center">
+                <button onclick="closeAuditModal()" class="w-full sm:w-auto px-8 py-2.5 bg-gray-900 hover:bg-black text-white text-sm font-bold rounded-lg shadow-md transition cursor-pointer">
+                    Tutup Analisis
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const STORAGE_KEY = 'laporan_penjualan_bmo_v5'; 
         
@@ -700,7 +729,7 @@
             { id: 45, name: 'Es teler', category: 'Minuman Online', price: 28000 },
             { id: 46, name: 'Es/Hot Cappucino', category: 'Minuman', price: 15000 },
             { id: 47, name: 'Godib Besar', category: 'Lain-lain', price: 6000 },
-            { id: 48, name: 'Godib Kecil', category: 'Lain-lain', price: 3000 },
+            { id: 48, name: 'Godib Kecil', category: 'Lain-lain', price: 4000 },
             { id: 49, name: 'Ice Cube', category: 'Minuman', price: 4000 },
             { id: 50, name: 'Jeruk Hangat', category: 'Minuman', price: 25000 },
             { id: 51, name: 'Jus Alpukat', category: 'Minuman', price: 25000 },
@@ -793,9 +822,9 @@
             { id: 138, name: 'Vietnam Drip', category: 'Minuman', price: 15000 },
             { id: 139, name: 'Vietnam Pisang Goreng', category: 'Makanan', price: 25000 },
             { id: 140, name: 'Vietnam Singkong', category: 'Makanan', price: 25000 },
-            { id: 141, name: 'Takeaway 1', category: 'Lain-lain', price: 0 },
-            { id: 142, name: 'Takeaway 2', category: 'Lain-lain', price: 0 },
-            { id: 143, name: 'Takeaway 3', category: 'Lain-lain', price: 0 }
+            { id: 141, name: 'Takeaway 1', category: 'Lain-lain', price: 2000 },
+            { id: 142, name: 'Takeaway 2', category: 'Lain-lain', price: 2000 },
+            { id: 143, name: 'Takeaway 3', category: 'Lain-lain', price: 2000 }
         ];
         
         let appState = {
@@ -1081,12 +1110,10 @@
                 
                 rec.general[currentShift].dpt5 = totalLain;
                 
-                // Update tampilan input jika shiftnya sedang aktif
                 if (currentShift === document.getElementById('shift-selector').value) {
                     document.getElementById('gen-dpt5').value = totalLain > 0 ? totalLain : '';
                 }
             }
-            // ----------------------------------------
             
             const totalElement = document.getElementById('total-' + id);
             if (totalElement) {
@@ -1302,7 +1329,6 @@
 
             const grandTotalGeneral = grandGenMakanan + grandGenMinuman + grandGenLainlain;
 
-            // --- Indikator Peringatan DPT 5 ---
             const currentGenDpt5 = currentShift === 'pagi' ? lainPagi : lainSiang;
             const currentTotalLainQty = currentShift === 'pagi' ? totalLainPagiQty : totalLainSiangQty;
             const warningEl = document.getElementById('dpt5-warning');
@@ -1314,7 +1340,6 @@
             } else {
                 warningEl.classList.add('hidden');
             }
-            // ----------------------------------
 
             document.getElementById('summary-pagi').innerText = formatRupiah(totalPagi);
             document.getElementById('summary-siang').innerText = formatRupiah(totalSiang);
@@ -1326,15 +1351,124 @@
             document.getElementById('total-general-all').innerText = formatRupiah(grandTotalGeneral);
 
             const balanceEl = document.getElementById('balance-status');
+            
+            // --- Logika Status Balance dengan Tombol Cari Selisih Baru ---
             if (grandTotalItems === 0 && grandTotalGeneral === 0) {
                 balanceEl.innerHTML = `<span class="bg-gray-100 text-gray-500 px-4 py-2 rounded-full text-sm font-bold border border-gray-200">- Menunggu Input -</span>`;
             } else if (grandTotalItems === grandTotalGeneral) {
                 balanceEl.innerHTML = `<span class="bg-green-100 text-green-700 px-5 py-2 rounded-full text-sm font-black border border-green-200 shadow-sm"><i class="fa-solid fa-check-circle mr-1"></i> BALANCE</span>`;
             } else {
                 const selisih = Math.abs(grandTotalItems - grandTotalGeneral);
-                balanceEl.innerHTML = `<span class="bg-red-100 text-red-700 px-4 py-2 rounded-full text-sm font-bold border border-red-200 shadow-sm"><i class="fa-solid fa-triangle-exclamation mr-1"></i> TIDAK BALANCE (Selisih: ${formatRupiah(selisih)})</span>`;
+                balanceEl.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <button onclick="openAuditModal()" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-md transition cursor-pointer flex items-center animate-pulse-soft">
+                            <i class="fa-solid fa-magnifying-glass mr-1.5"></i> Cari Selisih
+                        </button>
+                        <span class="bg-red-100 text-red-700 px-4 py-1.5 rounded-lg text-xs font-bold border border-red-200 shadow-sm">
+                            <i class="fa-solid fa-triangle-exclamation mr-1"></i> TIDAK BALANCE (Total Selisih: ${formatRupiah(selisih)})
+                        </span>
+                    </div>
+                `;
             }
         }
+
+        // --- FUNGSI BARU: ANALISIS SELISIH (AUDIT) ---
+        function openAuditModal() {
+            const rec = getDailyRecord();
+            let totalPagiItems = 0;
+            let totalSiangItems = 0;
+
+            // Hitung total harga item terjual (berdasarkan QTY) per Shift
+            appState.catalog.forEach(product => {
+                totalPagiItems += (rec.pagi[product.id] || 0) * product.price;
+                totalSiangItems += (rec.siang[product.id] || 0) * product.price;
+            });
+
+            // Hitung total General per Shift
+            const genP = rec.general.pagi;
+            const genS = rec.general.siang;
+
+            const totalPagiGen = (genP.makanan || 0) + (genP.makananOnline || 0) + (genP.diskonMakanan || 0) +
+                                 (genP.minuman || 0) + (genP.minumanOnline || 0) + (genP.diskonMinuman || 0) +
+                                 (genP.dpt5 || 0);
+                                 
+            const totalSiangGen = (genS.makanan || 0) + (genS.makananOnline || 0) + (genS.diskonMakanan || 0) +
+                                  (genS.minuman || 0) + (genS.minumanOnline || 0) + (genS.diskonMinuman || 0) +
+                                  (genS.dpt5 || 0);
+
+            const diffPagi = totalPagiItems - totalPagiGen;
+            const diffSiang = totalSiangItems - totalSiangGen;
+
+            // Fungsi helper untuk merender kotak hasil analisis per shift
+            const buildShiftCard = (shiftName, itemsTotal, genTotal, diff) => {
+                const isMatch = diff === 0;
+                const statusColor = isMatch ? 'text-green-600 bg-green-50 border-green-200' : 'text-red-700 bg-red-50 border-red-200';
+                const statusIcon = isMatch ? '<i class="fa-solid fa-check-circle"></i> SAMA (BALANCE)' : '<i class="fa-solid fa-triangle-exclamation"></i> BEDA (SELISIH)';
+                
+                let explanation = '';
+                if (!isMatch) {
+                    if (itemsTotal > genTotal) {
+                        explanation = `<div class="mt-3 text-[11px] text-red-600 font-medium bg-white p-2.5 rounded border border-red-100 shadow-sm leading-relaxed">💡 <b>Analisis:</b> Total harga dari input <b>QTY Item</b> lebih besar daripada input <b>General</b>. <br>Kemungkinan ada nominal General yang belum diketik/kurang, atau inputan QTY item terlalu banyak.</div>`;
+                    } else {
+                        explanation = `<div class="mt-3 text-[11px] text-red-600 font-medium bg-white p-2.5 rounded border border-red-100 shadow-sm leading-relaxed">💡 <b>Analisis:</b> Total <b>General</b> lebih besar daripada <b>QTY Item</b>. <br>Kemungkinan ada QTY item yang belum ditambahkan (lupa diinput), atau Anda salah mengetik nominal yang terlalu besar pada General.</div>`;
+                    }
+                }
+
+                return `
+                    <div class="border border-gray-200 rounded-xl p-4 bg-white shadow-sm relative overflow-hidden">
+                        ${!isMatch ? `<div class="absolute top-0 right-0 bg-red-500 text-white text-[10px] font-black px-3 py-1 rounded-bl-lg shadow-sm">CEK SHIFT INI</div>` : ''}
+                        <h4 class="font-bold text-gray-800 mb-3 border-b border-gray-100 pb-2">
+                            ${shiftName}
+                        </h4>
+                        <div class="grid grid-cols-2 gap-4 text-sm mb-3">
+                            <div class="bg-gray-50 p-2 rounded border border-gray-100">
+                                <span class="block text-[10px] text-gray-500 font-bold uppercase mb-1">Total QTY Item (Rp)</span>
+                                <span class="font-black text-blue-700">${formatRupiah(itemsTotal)}</span>
+                            </div>
+                            <div class="bg-gray-50 p-2 rounded border border-gray-100">
+                                <span class="block text-[10px] text-gray-500 font-bold uppercase mb-1">Total General (Rp)</span>
+                                <span class="font-black text-orange-600">${formatRupiah(genTotal)}</span>
+                            </div>
+                        </div>
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between p-2.5 rounded border ${statusColor}">
+                            <span class="text-xs font-bold">${statusIcon}</span>
+                            ${!isMatch ? `<span class="font-black text-sm mt-1 sm:mt-0 underline underline-offset-2">Selisih: ${formatRupiah(Math.abs(diff))}</span>` : ''}
+                        </div>
+                        ${explanation}
+                    </div>
+                `;
+            };
+
+            const auditBody = document.getElementById('audit-body');
+            auditBody.innerHTML = `
+                ${buildShiftCard('☀️ SHIFT PAGI', totalPagiItems, totalPagiGen, diffPagi)}
+                ${buildShiftCard('🌙 SHIFT SIANG', totalSiangItems, totalSiangGen, diffSiang)}
+                <div class="text-[11px] text-gray-500 text-center mt-4 bg-blue-50 p-3 rounded-lg border border-blue-100">
+                    <i class="fa-solid fa-circle-info text-blue-500 mr-1"></i> Silakan fokus mencocokkan/memperbaiki inputan QTY dan General pada shift yang memiliki label merah (Selisih).
+                </div>
+            `;
+
+            const modal = document.getElementById('audit-modal');
+            const content = document.getElementById('audit-content');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+                content.classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeAuditModal() {
+            const modal = document.getElementById('audit-modal');
+            const content = document.getElementById('audit-content');
+            modal.classList.add('opacity-0');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+        // ----------------------------------------------
 
         function toggleBottomBar() {
             const container = document.getElementById('bottom-bar-container');
@@ -1893,7 +2027,6 @@
             closeResetModal();
         }
 
-        // --- Fitur Baru: Menampilkan Detail Breakdown per Shift ---
         function showShiftDetails(shift) {
             const rec = getDailyRecord();
             let breakdown = {
