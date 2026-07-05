@@ -433,7 +433,6 @@
                 </div>
             </div>
 
-            <!-- BUG FIX SCROLL: padding p-5 dihapus dari container dan sticky ditaruh langsung di element <th> -->
             <div class="overflow-y-auto flex-1 max-h-[50vh] relative">
                 <table class="w-full text-left border-collapse">
                     <thead>
@@ -1188,9 +1187,14 @@
             }
         }
 
+        // --- BUG FIX PADA FUNGSI INI ---
         function executeDeleteAll() {
             appState.records = {};
-            triggerSave();
+            
+            // Perbaikan: Bypass setTimeout di triggerSave dengan menyimpan data kosong secara real-time.
+            // Hal ini mencegah initApp() memuat kembali data lama sebelum delay 500ms usai.
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+            
             initApp();
             closeDeleteAllModal();
             
