@@ -114,13 +114,21 @@
                     </div>
                 </div>
 
-                <div class="bg-purple-50 p-4 rounded-lg border border-purple-100 flex flex-col justify-between">
+                <div class="bg-purple-50 p-4 rounded-lg border border-purple-100 flex flex-col justify-between relative">
                     <div>
-                        <h4 class="text-xs font-bold text-purple-800 mb-3 uppercase border-b border-purple-200 pb-2">Kategori Lain-lain</h4>
+                        <h4 class="text-xs font-bold text-purple-800 mb-3 uppercase border-b border-purple-200 pb-2 flex justify-between">
+                            <span>Kategori Lain-lain</span>
+                            <span class="text-[9px] bg-purple-200 text-purple-700 px-1.5 py-0.5 rounded font-bold">Auto-Calc</span>
+                        </h4>
                         <div class="space-y-3">
                             <div class="flex items-center justify-between">
                                 <label class="text-sm text-gray-700 font-bold text-purple-900" title="Godib & Takeaway">DPT 5</label>
                                 <input type="number" id="gen-dpt5" oninput="updateGeneral('dpt5', this.value)" class="w-28 sm:w-32 lg:w-36 p-1.5 text-right border border-gray-300 rounded text-sm focus:ring-2 focus:ring-purple-500 bg-white font-semibold" placeholder="Rp 0">
+                            </div>
+                            
+                            <div id="dpt5-warning" class="hidden mt-2 bg-red-100 border border-red-200 text-red-700 text-[10px] font-bold p-1.5 rounded flex items-start gap-1.5 leading-tight">
+                                <i class="fa-solid fa-triangle-exclamation mt-0.5"></i>
+                                <span id="dpt5-warning-text">Beda dgn total QTY Item (Rp 0)</span>
                             </div>
                         </div>
                     </div>
@@ -222,11 +230,15 @@
             <div class="grid grid-cols-1 xl:grid-cols-4 gap-4 items-center">
                 
                 <div class="xl:col-span-3 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 text-xs">
-                    <div class="bg-gray-50 p-2 rounded-lg border border-gray-200">
+                    
+                    <div onclick="showShiftDetails('pagi')" class="clickable-card bg-gray-50 hover:bg-gray-100 p-2 rounded-lg border border-gray-200 cursor-pointer transition shadow-sm group relative">
+                        <div class="absolute top-1 right-2 text-gray-400 group-hover:text-blue-500"><i class="fa-solid fa-up-right-and-down-left-from-center text-[10px]"></i></div>
                         <span class="text-gray-500 block mb-0.5 text-[10px] uppercase">Total Penjualan Pagi</span>
                         <span class="font-bold text-gray-800 text-xs sm:text-sm" id="summary-pagi">Rp 0</span>
                     </div>
-                    <div class="bg-gray-50 p-2 rounded-lg border border-gray-200">
+                    
+                    <div onclick="showShiftDetails('siang')" class="clickable-card bg-gray-50 hover:bg-gray-100 p-2 rounded-lg border border-gray-200 cursor-pointer transition shadow-sm group relative">
+                        <div class="absolute top-1 right-2 text-gray-400 group-hover:text-indigo-500"><i class="fa-solid fa-up-right-and-down-left-from-center text-[10px]"></i></div>
                         <span class="text-gray-500 block mb-0.5 text-[10px] uppercase">Total Penjualan Siang</span>
                         <span class="font-bold text-gray-800 text-xs sm:text-sm" id="summary-siang">Rp 0</span>
                     </div>
@@ -313,7 +325,24 @@
             </div>
             
             <div class="p-4 bg-gray-50 rounded-b-xl border-t border-gray-100 text-center">
-                <button onclick="closeDetails()" class="px-6 py-2 bg-gray-800 text-white text-sm font-semibold rounded-lg hover:bg-black transition">Tutup Rincian</button>
+                <button onclick="closeDetails()" class="px-6 py-2 bg-gray-800 text-white text-sm font-semibold rounded-lg hover:bg-black transition cursor-pointer">Tutup Rincian</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="shift-detail-modal" class="fixed inset-0 z-50 hidden bg-gray-900/50 backdrop-blur-sm flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm transform scale-95 transition-transform duration-300" id="shift-modal-content">
+            <div class="flex justify-between items-center p-4 border-b border-gray-100">
+                <h3 class="font-bold text-gray-800 flex items-center" id="shift-modal-title">
+                </h3>
+                <button onclick="closeShiftDetails()" class="text-gray-400 hover:text-red-500 transition cursor-pointer">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+            <div class="p-5" id="shift-modal-body">
+            </div>
+            <div class="p-4 bg-gray-50 rounded-b-xl border-t border-gray-100 text-center">
+                <button onclick="closeShiftDetails()" class="px-6 py-2 bg-gray-800 text-white text-sm font-semibold rounded-lg hover:bg-black transition cursor-pointer">Tutup Rincian</button>
             </div>
         </div>
     </div>
@@ -898,6 +927,7 @@
             
             loadGeneralInputs();
             renderTable();
+            calculateTotals();
         }
 
         function loadGeneralInputs() {
@@ -1039,6 +1069,24 @@
             rec[currentShift][id] = qty;
             
             const product = appState.catalog.find(p => p.id === id);
+            
+            // --- Fitur Auto-Calc DPT 5 (Lain-lain) ---
+            if (product && product.category === 'Lain-lain') {
+                let totalLain = 0;
+                appState.catalog.forEach(p => {
+                    if (p.category === 'Lain-lain') {
+                        totalLain += (rec[currentShift][p.id] || 0) * p.price;
+                    }
+                });
+                
+                rec.general[currentShift].dpt5 = totalLain;
+                
+                // Update tampilan input jika shiftnya sedang aktif
+                if (currentShift === document.getElementById('shift-selector').value) {
+                    document.getElementById('gen-dpt5').value = totalLain > 0 ? totalLain : '';
+                }
+            }
+            // ----------------------------------------
             
             const totalElement = document.getElementById('total-' + id);
             if (totalElement) {
@@ -1217,12 +1265,24 @@
         function calculateTotals() {
             let totalPagi = 0;
             let totalSiang = 0;
+            let totalLainPagiQty = 0;
+            let totalLainSiangQty = 0;
+
             const rec = getDailyRecord();
 
             appState.catalog.forEach(product => {
-                totalPagi += (rec.pagi[product.id] || 0) * product.price;
-                totalSiang += (rec.siang[product.id] || 0) * product.price;
+                const qtyPagi = rec.pagi[product.id] || 0;
+                const qtySiang = rec.siang[product.id] || 0;
+
+                totalPagi += qtyPagi * product.price;
+                totalSiang += qtySiang * product.price;
+
+                if (product.category === 'Lain-lain') {
+                    totalLainPagiQty += qtyPagi * product.price;
+                    totalLainSiangQty += qtySiang * product.price;
+                }
             });
+
             const grandTotalItems = totalPagi + totalSiang;
 
             const genP = rec.general.pagi;
@@ -1241,6 +1301,20 @@
             const grandGenLainlain = lainPagi + lainSiang;
 
             const grandTotalGeneral = grandGenMakanan + grandGenMinuman + grandGenLainlain;
+
+            // --- Indikator Peringatan DPT 5 ---
+            const currentGenDpt5 = currentShift === 'pagi' ? lainPagi : lainSiang;
+            const currentTotalLainQty = currentShift === 'pagi' ? totalLainPagiQty : totalLainSiangQty;
+            const warningEl = document.getElementById('dpt5-warning');
+            const warningText = document.getElementById('dpt5-warning-text');
+
+            if (currentGenDpt5 !== currentTotalLainQty) {
+                warningEl.classList.remove('hidden');
+                warningText.innerText = `Beda dgn total QTY Item (${formatRupiah(currentTotalLainQty)})`;
+            } else {
+                warningEl.classList.add('hidden');
+            }
+            // ----------------------------------
 
             document.getElementById('summary-pagi').innerText = formatRupiah(totalPagi);
             document.getElementById('summary-siang').innerText = formatRupiah(totalSiang);
@@ -1541,15 +1615,14 @@
                 }
             });
 
-            // ====== Logika Manajemen Filtering Diskon (Makanan & Minuman) ======
             let includeFoodDiscount = false;
             let foodWarning = null;
             if (mChecked && moChecked) {
-                includeFoodDiscount = true; // Keduanya ter-checklist, diskon Makanan full valid
+                includeFoodDiscount = true; 
             } else if (!mChecked && !moChecked) {
-                includeFoodDiscount = false; // Keduanya dimatikan, abaikan semua diskon Makanan
+                includeFoodDiscount = false; 
             } else {
-                includeFoodDiscount = true; // Salah satu mati, tetap hitung diskon Makanan namun beri warning
+                includeFoodDiscount = true; 
                 foodWarning = !mChecked ? 'Makanan' : 'Mak. Online';
             }
 
@@ -1581,7 +1654,6 @@
                     let diskonMinPagi = genP.diskonMinuman || 0;
                     let diskonMinSiang = genS.diskonMinuman || 0;
 
-                    // Meng-nol-kan (0) perhitungan diskon jika kategorinya dimatikan total
                     if (!includeFoodDiscount) {
                         diskonMakPagi = 0;
                         diskonMakSiang = 0;
@@ -1612,7 +1684,6 @@
 
             const netPenjualan = grandPrice - totalDiskonPeriode;
 
-            // Updating Rincian Harga UI Boxes
             document.getElementById('finishing-grand-qty').innerText = `${grandQty.toLocaleString('id-ID')} Pcs Item Terjual`;
             document.getElementById('finishing-grand-price').innerText = formatRupiah(grandPrice);
             
@@ -1620,7 +1691,6 @@
             document.getElementById('finishing-total-diskon-rincian').innerText = `Mak: ${formatRupiah(totalDiskonMakPeriode)} | Min: ${formatRupiah(totalDiskonMinPeriode)}`;
             document.getElementById('finishing-net-price').innerText = formatRupiah(netPenjualan);
 
-            // Handler Box Warning Kuning
             let warnings = [];
             if (foodWarning) warnings.push(foodWarning);
             if (drinkWarning) warnings.push(drinkWarning);
@@ -1638,7 +1708,6 @@
                 normalNetText.classList.remove('hidden');
             }
 
-            // Updating Dropdown Rincian Teks
             document.getElementById('discount-rincian-periode').innerHTML = `Total Diskon Makanan: <b class="text-red-700">${formatRupiah(totalDiskonMakPeriode)}</b> &nbsp;|&nbsp; Total Diskon Minuman: <b class="text-red-700">${formatRupiah(totalDiskonMinPeriode)}</b>`;
 
             const noDiskonMsg = document.getElementById('no-discount-msg');
@@ -1822,6 +1891,85 @@
             renderTable();
             calculateTotals();
             closeResetModal();
+        }
+
+        // --- Fitur Baru: Menampilkan Detail Breakdown per Shift ---
+        function showShiftDetails(shift) {
+            const rec = getDailyRecord();
+            let breakdown = {
+                'Makanan': 0,
+                'Minuman': 0,
+                'Makanan Online': 0,
+                'Minuman Online': 0,
+                'Lain-lain': 0
+            };
+            let totalShift = 0;
+
+            appState.catalog.forEach(product => {
+                const qty = rec[shift][product.id] || 0;
+                if (qty > 0) {
+                    const lineTotal = qty * product.price;
+                    breakdown[product.category] = (breakdown[product.category] || 0) + lineTotal;
+                    totalShift += lineTotal;
+                }
+            });
+
+            const shiftName = shift === 'pagi' ? '☀️ Shift Pagi' : '🌙 Shift Siang';
+            const titleColor = shift === 'pagi' ? 'text-blue-600' : 'text-indigo-600';
+            
+            document.getElementById('shift-modal-title').innerHTML = `<i class="fa-solid fa-chart-pie ${titleColor} mr-2"></i> Rincian Penjualan ${shiftName}`;
+            
+            const tbody = document.getElementById('shift-modal-body');
+            tbody.innerHTML = `
+                <div class="space-y-2">
+                    <div class="flex justify-between p-2 bg-gray-50 rounded border border-gray-100">
+                        <span class="text-sm font-semibold text-gray-700">🍕 Makanan</span>
+                        <span class="text-sm font-bold text-gray-900">${formatRupiah(breakdown['Makanan'])}</span>
+                    </div>
+                    <div class="flex justify-between p-2 bg-gray-50 rounded border border-gray-100">
+                        <span class="text-sm font-semibold text-gray-700">☕ Minuman</span>
+                        <span class="text-sm font-bold text-gray-900">${formatRupiah(breakdown['Minuman'])}</span>
+                    </div>
+                    <div class="flex justify-between p-2 bg-gray-50 rounded border border-gray-100">
+                        <span class="text-sm font-semibold text-gray-700">🛵 Mak. Online</span>
+                        <span class="text-sm font-bold text-gray-900">${formatRupiah(breakdown['Makanan Online'])}</span>
+                    </div>
+                    <div class="flex justify-between p-2 bg-gray-50 rounded border border-gray-100">
+                        <span class="text-sm font-semibold text-gray-700">🥤 Min. Online</span>
+                        <span class="text-sm font-bold text-gray-900">${formatRupiah(breakdown['Minuman Online'])}</span>
+                    </div>
+                    <div class="flex justify-between p-2 bg-gray-50 rounded border border-gray-100">
+                        <span class="text-sm font-semibold text-gray-700">📦 Lain-lain</span>
+                        <span class="text-sm font-bold text-gray-900">${formatRupiah(breakdown['Lain-lain'])}</span>
+                    </div>
+                    <div class="flex justify-between p-3 bg-${shift==='pagi'?'blue':'indigo'}-50 rounded-lg border border-${shift==='pagi'?'blue':'indigo'}-200 mt-4">
+                        <span class="text-sm font-black text-${shift==='pagi'?'blue':'indigo'}-800 uppercase">Total Keseluruhan</span>
+                        <span class="text-lg font-black text-${shift==='pagi'?'blue':'indigo'}-900">${formatRupiah(totalShift)}</span>
+                    </div>
+                </div>
+            `;
+
+            const modal = document.getElementById('shift-detail-modal');
+            const content = document.getElementById('shift-modal-content');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+                content.classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeShiftDetails() {
+            const modal = document.getElementById('shift-detail-modal');
+            const content = document.getElementById('shift-modal-content');
+            
+            modal.classList.add('opacity-0');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-95');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300); 
         }
 
         function showDetails(type) {
