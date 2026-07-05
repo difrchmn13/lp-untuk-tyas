@@ -35,9 +35,8 @@
 </head>
 <body class="bg-gray-100 font-sans min-h-screen pb-64 overflow-x-hidden">
 
-    <div class="max-w-6xl mx-auto px-4 py-8">
+    <div class="max-w-6xl mx-auto px-4 py-8" id="top-header">
         
-        <!-- Header -->
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 bg-white p-6 rounded-xl shadow-sm gap-4 border border-gray-200 border-l-4 border-l-blue-600">
             <div>
                 <h1 class="text-2xl font-bold text-gray-800 mb-2">Laporan Penjualan Harian</h1>
@@ -64,7 +63,6 @@
             </div>
         </div>
 
-        <!-- Input General -->
         <div class="bg-white p-5 rounded-xl shadow-sm mb-6 border border-gray-200 relative overflow-hidden">
             <div class="absolute top-0 right-0 bg-blue-100 text-blue-800 font-bold px-4 py-1 rounded-bl-lg text-xs" id="general-shift-badge">
                 Shift Pagi
@@ -76,7 +74,6 @@
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 
-                <!-- Kategori Makanan -->
                 <div class="bg-orange-50 p-4 rounded-lg border border-orange-100 flex flex-col justify-between">
                     <div>
                         <h4 class="text-xs font-bold text-orange-800 mb-3 uppercase border-b border-orange-200 pb-2">Kategori Makanan</h4>
@@ -97,7 +94,6 @@
                     </div>
                 </div>
 
-                <!-- Kategori Minuman -->
                 <div class="bg-cyan-50 p-4 rounded-lg border border-cyan-100 flex flex-col justify-between">
                     <div>
                         <h4 class="text-xs font-bold text-cyan-800 mb-3 uppercase border-b border-cyan-200 pb-2">Kategori Minuman</h4>
@@ -118,7 +114,6 @@
                     </div>
                 </div>
 
-                <!-- Kategori Lain-lain (DPT 5) -->
                 <div class="bg-purple-50 p-4 rounded-lg border border-purple-100 flex flex-col justify-between">
                     <div>
                         <h4 class="text-xs font-bold text-purple-800 mb-3 uppercase border-b border-purple-200 pb-2">Kategori Lain-lain</h4>
@@ -137,12 +132,12 @@
             </div>
         </div>
 
-        <!-- Tambah Item Baru -->
-        <div class="bg-white p-4 rounded-xl shadow-sm mb-6 border border-gray-200">
-            <details>
-                <summary class="text-sm font-bold text-gray-700 uppercase cursor-pointer flex items-center hover:text-blue-600 transition">
-                    <i class="fa-solid fa-plus-circle mr-2"></i>Tambah Item Baru ke Database
-                </summary>
+        <div class="bg-white p-4 rounded-xl shadow-sm mb-6 border border-gray-200" id="add-item-section">
+            <div id="add-item-header" onclick="toggleAddItemSection()" class="text-sm font-bold text-gray-700 uppercase cursor-pointer flex items-center justify-between hover:text-blue-600 transition select-none">
+                <span class="flex items-center"><i class="fa-solid fa-plus-circle mr-2 text-blue-600"></i>Tambah Item Baru ke List Katalog</span>
+                <i id="add-item-icon" class="fa-solid fa-chevron-down transition-transform duration-300 text-gray-400"></i>
+            </div>
+            <div id="add-item-form-container" class="max-h-0 overflow-hidden transition-all duration-500 ease-in-out opacity-0">
                 <form id="add-item-form" class="flex flex-col md:flex-row gap-3 items-end mt-4 pt-4 border-t border-gray-100" onsubmit="event.preventDefault(); addItem();">
                     <div class="w-full md:w-1/3">
                         <label class="block text-xs font-semibold text-gray-600 mb-1">Nama Item</label>
@@ -163,15 +158,14 @@
                         <input type="number" id="add-price" required min="0" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50 text-sm" placeholder="0">
                     </div>
                     <div class="w-full md:w-auto">
-                        <button type="submit" class="w-full md:w-auto px-5 py-2 bg-gray-800 hover:bg-black text-white font-semibold rounded-lg shadow-sm transition text-sm">
+                        <button type="submit" class="w-full md:w-auto px-5 py-2 bg-gray-800 hover:bg-black text-white font-semibold rounded-lg shadow-sm transition text-sm cursor-pointer">
                             Tambahkan
                         </button>
                     </div>
                 </form>
-            </details>
+            </div>
         </div>
 
-        <!-- Filter & Katalog Utama -->
         <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-4 gap-4">
             <div class="flex flex-wrap gap-2" id="filter-container">
                 <button onclick="filterCategory('all')" id="btn-all" class="category-btn px-4 py-1.5 rounded-full text-xs font-bold bg-blue-600 text-white shadow-sm transition cursor-pointer border border-blue-600 tracking-wide uppercase">Semua Menu</button>
@@ -188,7 +182,6 @@
             </div>
         </div>
 
-        <!-- Tabel Produk -->
         <div class="bg-white rounded-xl shadow-md overflow-hidden mb-6 border border-gray-200">
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse min-w-[800px]">
@@ -198,7 +191,7 @@
                             <th class="p-3 w-1/3">Nama Item</th>
                             <th class="p-3 w-40 text-center">Kategori</th>
                             <th class="p-3 text-right w-32">Harga</th>
-                            <th class="p-3 text-center w-32 bg-blue-50 border-x border-blue-100 text-blue-800 rounded-t-lg transition-colors"><span id="th-shift-label">QTY Pagi</span></th>
+                            <th class="p-3 text-center w-36 bg-blue-50 border-x border-blue-100 text-blue-800 rounded-t-lg transition-colors"><span id="th-shift-label">QTY Pagi</span></th>
                             <th class="p-3 text-right w-32">Total Shift</th>
                             <th class="p-3 text-center w-16">Aksi</th>
                         </tr>
@@ -214,7 +207,6 @@
         </div>
     </div>
 
-    <!-- Bottom Bar (Ringkasan Penjualan) -->
     <div id="bottom-bar-container" class="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 shadow-[0_-10px_20px_rgba(0,0,0,0.05)] z-40 transition-transform duration-500 ease-in-out transform translate-y-0">
         
         <div onclick="toggleBottomBar()" class="absolute -top-7 left-1/2 transform -translate-x-1/2 bg-white border-t border-x border-gray-200 rounded-t-lg px-8 py-1.5 cursor-pointer z-50 text-gray-500 hover:text-blue-600 hover:bg-gray-50 transition shadow-[0_-5px_15px_rgba(0,0,0,0.05)] flex items-center gap-2">
@@ -287,7 +279,6 @@
         </div>
     </div>
 
-    <!-- MODAL 1: Rincian General -->
     <div id="detail-modal" class="fixed inset-0 z-50 hidden bg-gray-900/50 backdrop-blur-sm flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-md transform scale-95 transition-transform duration-300" id="modal-content">
             <div class="flex justify-between items-center p-4 border-b border-gray-100">
@@ -327,7 +318,6 @@
         </div>
     </div>
 
-    <!-- MODAL 2: Reset Shift Warning -->
     <div id="reset-modal" class="fixed inset-0 z-50 hidden bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden transform scale-95 transition-transform duration-300" id="reset-modal-content">
             <div class="p-6 text-center">
@@ -353,16 +343,15 @@
         </div>
     </div>
 
-    <!-- MODAL 3: Fitur Finishing (Rekap Periode) -->
     <div id="finishing-modal" class="fixed inset-0 z-50 hidden bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] flex flex-col overflow-hidden transform scale-95 transition-transform duration-300" id="finishing-modal-content">
             
             <div class="flex justify-between items-center p-5 bg-indigo-600 text-white">
                 <div>
                     <h3 class="font-bold text-lg flex items-center">
-                        <i class="fa-solid fa-flag-checkered mr-2 text-yellow-300"></i> Finishing (Laporan Periode)
+                        <i class="fa-solid fa-flag-checkered mr-2 text-yellow-300"></i> Finishing (Laporan & Diskon Periode)
                     </h3>
-                    <p class="text-xs text-indigo-100">Rekap total penjualan berdasarkan rentang tanggal. <span class="font-semibold text-yellow-200"><i class="fa-solid fa-hand-pointer ml-1 mr-1"></i> Klik pada baris item untuk mem-breakdown riwayat tanggal jual.</span></p>
+                    <p class="text-xs text-indigo-100">Rekap total penjualan berdasarkan rentang tanggal. <span class="font-semibold text-yellow-200"><i class="fa-solid fa-hand-pointer ml-1 mr-1"></i> Klik baris menu untuk breakdown riwayat tanggal jual.</span></p>
                 </div>
                 <button onclick="closeFinishingModal()" class="text-white/80 hover:text-white bg-indigo-700/50 hover:bg-indigo-700 p-2 rounded-full transition cursor-pointer">
                     <i class="fa-solid fa-xmark text-xl w-5 h-5 flex items-center justify-center"></i>
@@ -433,7 +422,7 @@
                 </div>
             </div>
 
-            <div class="overflow-y-auto flex-1 max-h-[50vh] relative">
+            <div class="overflow-y-auto flex-1 max-h-[40vh] relative">
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="text-gray-600 text-xs font-bold uppercase tracking-wider">
@@ -453,21 +442,51 @@
                 </div>
             </div>
 
-            <div class="p-5 bg-indigo-50 border-t border-indigo-100 flex flex-col sm:flex-row justify-between items-center gap-4">
-                <div class="text-center sm:text-left">
-                    <span class="text-xs font-bold text-indigo-900 uppercase tracking-wider block">Total QTY Keseluruhan Item</span>
-                    <span id="finishing-grand-qty" class="text-2xl font-black text-indigo-700">0 Pcs</span>
+            <div class="p-5 bg-indigo-50/80 border-t border-indigo-100 space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-white p-4 rounded-xl border border-indigo-100 shadow-sm">
+                    <div>
+                        <span class="text-[10px] font-bold text-gray-500 uppercase tracking-wider block mb-1">Total Penjualan Item (Gross)</span>
+                        <span id="finishing-grand-price" class="text-lg font-black text-gray-800">Rp 0</span>
+                        <span id="finishing-grand-qty" class="text-[11px] text-indigo-600 font-bold block mt-0.5">0 Pcs Item Terjual</span>
+                    </div>
+                    <div class="border-t sm:border-t-0 sm:border-l border-gray-100 pt-3 sm:pt-0 sm:pl-4">
+                        <span class="text-[10px] font-bold text-red-600 uppercase tracking-wider block mb-1"><i class="fa-solid fa-tags mr-1"></i> Total Diskon Periode</span>
+                        <span id="finishing-total-diskon" class="text-lg font-black text-red-600">Rp 0</span>
+                        <span id="finishing-total-diskon-rincian" class="text-[10px] text-gray-400 font-semibold block mt-0.5">Mak: Rp 0 | Min: Rp 0</span>
+                    </div>
+                    <div class="border-t sm:border-t-0 sm:border-l border-gray-100 pt-3 sm:pt-0 sm:pl-4 relative flex flex-col justify-center">
+                        <span class="text-[10px] font-bold text-green-600 uppercase tracking-wider block mb-1"><i class="fa-solid fa-wallet mr-1"></i> Penjualan Bersih (Net)</span>
+                        <span id="finishing-net-price" class="text-lg font-black text-green-700">Rp 0</span>
+                        <span id="finishing-net-normal-text" class="text-[10px] text-gray-500 block mt-0.5">Total Penjualan dikurangi Diskon</span>
+                        <div id="finishing-net-warning" class="hidden mt-1 text-[10px] font-bold text-amber-700 bg-amber-50 px-1.5 py-1 rounded border border-amber-200 leading-tight">
+                            <i class="fa-solid fa-circle-exclamation"></i> Belum termasuk: <span id="finishing-net-warning-text"></span>
+                        </div>
+                    </div>
                 </div>
-                <div class="text-center sm:text-right">
-                    <span class="text-xs font-bold text-indigo-900 uppercase tracking-wider block">Total Harga Keseluruhan Item</span>
-                    <span id="finishing-grand-price" class="text-2xl font-black text-green-600">Rp 0</span>
+
+                <div class="bg-red-50/80 border border-red-200 rounded-xl p-3.5">
+                    <div class="flex justify-between items-start sm:items-center cursor-pointer select-none" onclick="toggleDiscountList()">
+                        <div>
+                            <span class="text-xs font-bold text-red-800 uppercase tracking-wider flex items-center">
+                                <i class="fa-solid fa-receipt text-red-600 mr-2 text-sm"></i> Rincian Tanggal Potongan Diskon
+                                <span id="discount-count-badge" class="ml-2 bg-red-600 text-white text-[10px] px-2 py-0.5 rounded-full font-bold">0 Hari</span>
+                            </span>
+                            <div id="discount-rincian-periode" class="text-[10px] font-medium text-red-600/80 mt-1.5 sm:ml-6">
+                                Total Diskon Makanan: Rp 0 &nbsp;|&nbsp; Total Diskon Minuman: Rp 0
+                            </div>
+                        </div>
+                        <i id="discount-toggle-icon" class="fa-solid fa-chevron-down text-red-700 text-xs transition-transform duration-300 mt-1 sm:mt-0"></i>
+                    </div>
+                    <div id="discount-list-container" class="space-y-2 max-h-36 overflow-y-auto mt-3 pt-3 border-t border-red-200 text-xs text-gray-700 hidden">
+                        <p id="no-discount-msg" class="text-gray-500 italic text-center py-2">Tidak ada catatan potongan diskon pada rentang periode ini.</p>
+                        <div id="discount-list-items" class="space-y-1.5 hidden"></div>
+                    </div>
                 </div>
             </div>
 
         </div>
     </div>
 
-    <!-- MODAL 4: User-Friendly Alert / Error Notification -->
     <div id="custom-alert-modal" class="fixed inset-0 z-[60] hidden bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform scale-95 transition-transform duration-300" id="custom-alert-content">
             <div class="p-6 text-center">
@@ -485,7 +504,28 @@
         </div>
     </div>
 
-    <!-- MODAL 5: User-Friendly Delete All Confirmation -->
+    <div id="delete-confirm-modal" class="fixed inset-0 z-[65] hidden bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden transform scale-95 transition-transform duration-300" id="delete-confirm-content">
+            <div class="p-6 text-center">
+                <div class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl shadow-inner">
+                    <i class="fa-solid fa-trash-can"></i>
+                </div>
+                <h3 class="font-bold text-lg text-gray-800 mb-2">Hapus Item Katalog?</h3>
+                <p class="text-sm text-gray-600 mb-6 leading-relaxed">
+                    Apakah Anda yakin ingin menghapus <span id="delete-item-name-preview" class="font-bold text-red-600"></span> dari list katalog secara permanen?
+                </p>
+                <div class="flex gap-3">
+                    <button onclick="closeDeleteConfirmModal()" class="flex-1 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-semibold rounded-xl transition cursor-pointer">
+                        Batal
+                    </button>
+                    <button onclick="confirmDeleteItem()" class="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white text-sm font-bold rounded-xl shadow-md transition cursor-pointer">
+                        Ya, Hapus
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="delete-all-modal" class="fixed inset-0 z-[60] hidden bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform scale-95 transition-transform duration-300" id="delete-all-content">
             <div class="p-6">
@@ -504,7 +544,7 @@
                     <ul class="list-disc list-inside space-y-1 ml-1 text-gray-700">
                         <li>Seluruh inputan <b>QTY Item</b> di semua tanggal akan direset ke 0.</li>
                         <li>Seluruh inputan <b>General</b> di semua tanggal akan direset ke 0.</li>
-                        <li class="text-green-700 font-semibold"><i class="fa-solid fa-check mr-1"></i> Database nama menu & harga katalog TETAP AMAN.</li>
+                        <li class="text-green-700 font-semibold"><i class="fa-solid fa-check mr-1"></i> Perubahan nama menu & harga katalog TETAP AMAN.</li>
                     </ul>
                 </div>
 
@@ -525,7 +565,6 @@
         </div>
     </div>
 
-    <!-- MODAL 6: Breakdown Item per Tanggal & Shift (NEW FEATURE) -->
     <div id="breakdown-modal" class="fixed inset-0 z-[70] hidden bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[85vh] flex flex-col overflow-hidden transform scale-95 transition-transform duration-300" id="breakdown-content">
             
@@ -740,6 +779,7 @@
         let currentFilter = 'all';
         let searchQuery = '';
         let typingTimer;
+        let itemToDeleteId = null;
         const doneTypingInterval = 500;
 
         function initApp() {
@@ -851,9 +891,9 @@
             
             const thQty = document.getElementById('th-shift-label').parentElement;
             if(currentShift === 'siang') {
-                thQty.className = "p-3 text-center w-32 bg-indigo-50 border-x border-indigo-100 text-indigo-800 rounded-t-lg transition-colors";
+                thQty.className = "p-3 text-center w-36 bg-indigo-50 border-x border-indigo-100 text-indigo-800 rounded-t-lg transition-colors";
             } else {
-                thQty.className = "p-3 text-center w-32 bg-blue-50 border-x border-blue-100 text-blue-800 rounded-t-lg transition-colors";
+                thQty.className = "p-3 text-center w-36 bg-blue-50 border-x border-blue-100 text-blue-800 rounded-t-lg transition-colors";
             }
             
             loadGeneralInputs();
@@ -946,9 +986,17 @@
                         </div>
                     </td>
                     <td class="p-2 text-center border-x border-gray-50 bg-gray-50/50">
-                        <input type="number" id="qty-${product.id}" min="0" value="${qty > 0 ? qty : ''}" placeholder="0"
-                            oninput="updateQty(${product.id}, this.value)" 
-                            class="w-20 text-center p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono ${inputQtyClass} mx-auto block transition-colors">
+                        <div class="flex items-center justify-center gap-1.5">
+                            <button type="button" onclick="changeQtyBy(${product.id}, -1)" class="text-gray-400 hover:text-red-500 hover:bg-red-50 w-7 h-7 rounded-md transition flex items-center justify-center cursor-pointer select-none" title="Kurangi QTY (-1)">
+                                <i class="fa-solid fa-minus text-sm"></i>
+                            </button>
+                            <input type="number" id="qty-${product.id}" min="0" value="${qty > 0 ? qty : ''}" placeholder="0"
+                                oninput="updateQty(${product.id}, this.value)" 
+                                class="w-12 h-8 text-center border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono ${inputQtyClass} transition-colors shadow-inner">
+                            <button type="button" onclick="changeQtyBy(${product.id}, 1)" class="text-gray-400 hover:text-blue-600 hover:bg-blue-50 w-7 h-7 rounded-md transition flex items-center justify-center cursor-pointer select-none" title="Tambah QTY (+1)">
+                                <i class="fa-solid fa-plus text-sm"></i>
+                            </button>
+                        </div>
                     </td>
                     <td class="p-3 text-right font-bold ${totalColorClass} font-mono whitespace-nowrap transition-colors" id="total-${product.id}">
                         ${formatRupiah(totalItem)}
@@ -973,6 +1021,18 @@
             }
         }
 
+        function changeQtyBy(id, delta) {
+            const rec = getDailyRecord();
+            let currentQty = parseInt(rec[currentShift][id]) || 0;
+            let newQty = Math.max(0, currentQty + delta);
+            
+            const inputEl = document.getElementById('qty-' + id);
+            if (inputEl) {
+                inputEl.value = newQty > 0 ? newQty : '';
+            }
+            updateQty(id, newQty);
+        }
+
         function updateQty(id, val) {
             const qty = parseInt(val) || 0;
             const rec = getDailyRecord();
@@ -988,8 +1048,11 @@
 
             const inputEl = document.getElementById('qty-' + id);
             if (inputEl) {
-                const shiftColor = currentShift === 'pagi' ? 'bg-blue-100 text-blue-800 border-blue-400' : 'bg-indigo-100 text-indigo-800 border-indigo-400';
-                inputEl.className = `w-20 text-center p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono mx-auto block transition-colors ${qty > 0 ? shiftColor + ' font-black' : 'bg-white text-gray-900 border-gray-300'}`;
+                const shiftColor = currentShift === 'pagi' ? 'bg-blue-100 text-blue-800 border-blue-400 font-black' : 'bg-indigo-100 text-indigo-800 border-indigo-400 font-black';
+                inputEl.className = `w-12 h-8 text-center border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono transition-colors shadow-inner ${qty > 0 ? shiftColor : 'bg-white text-gray-900 border-gray-300'}`;
+                if (parseInt(inputEl.value) !== qty && !(qty === 0 && inputEl.value === '')) {
+                    inputEl.value = qty > 0 ? qty : '';
+                }
             }
 
             calculateTotals();
@@ -1017,14 +1080,72 @@
             }
         }
 
+        function toggleAddItemSection() {
+            const container = document.getElementById('add-item-form-container');
+            const icon = document.getElementById('add-item-icon');
+            
+            if (container.classList.contains('max-h-0')) {
+                container.classList.remove('max-h-0', 'opacity-0');
+                container.classList.add('max-h-[500px]', 'opacity-100');
+                icon.classList.add('rotate-180');
+                
+                setTimeout(() => {
+                    document.getElementById('add-name').focus();
+                }, 300);
+            } else {
+                container.classList.add('max-h-0', 'opacity-0');
+                container.classList.remove('max-h-[500px]', 'opacity-100');
+                icon.classList.remove('rotate-180');
+            }
+        }
+
         function deleteItem(id) {
             const product = appState.catalog.find(p => p.id === id);
-            if (confirm(`Hapus "${product.name}" dari DATABASE secara permanen?`)) {
-                appState.catalog = appState.catalog.filter(p => p.id !== id);
-                triggerSave();
-                renderTable();
-                calculateTotals();
-            }
+            if (!product) return;
+            
+            itemToDeleteId = id;
+            document.getElementById('delete-item-name-preview').innerText = `"${product.name}"`;
+            
+            const modal = document.getElementById('delete-confirm-modal');
+            const content = document.getElementById('delete-confirm-content');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+                content.classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeDeleteConfirmModal() {
+            const modal = document.getElementById('delete-confirm-modal');
+            const content = document.getElementById('delete-confirm-content');
+            modal.classList.add('opacity-0');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                itemToDeleteId = null;
+            }, 300);
+        }
+
+        function confirmDeleteItem() {
+            if (itemToDeleteId === null) return;
+            const product = appState.catalog.find(p => p.id === itemToDeleteId);
+            const deletedName = product ? product.name : 'Item';
+            
+            appState.catalog = appState.catalog.filter(p => p.id !== itemToDeleteId);
+            triggerSave();
+            renderTable();
+            calculateTotals();
+            closeDeleteConfirmModal();
+            
+            setTimeout(() => {
+                showCustomAlert(
+                    'Item Berhasil Dihapus',
+                    `Menu "${deletedName}" telah berhasil dihapus dari list katalog.`,
+                    'success'
+                );
+            }, 350);
         }
 
         function addItem() {
@@ -1045,6 +1166,12 @@
             renderTable();
             
             if (currentFilter !== 'all' && currentFilter !== category) filterCategory(category);
+
+            showCustomAlert(
+                'Berhasil Menambahkan Item!',
+                `Menu "${name}" (Kategori: ${category}, Harga: ${formatRupiah(price)}) telah sukses ditambahkan ke katalog.`,
+                'success'
+            );
         }
 
         function handleSearch() {
@@ -1187,12 +1314,8 @@
             }
         }
 
-        // --- BUG FIX PADA FUNGSI INI ---
         function executeDeleteAll() {
             appState.records = {};
-            
-            // Perbaikan: Bypass setTimeout di triggerSave dengan menyimpan data kosong secara real-time.
-            // Hal ini mencegah initApp() memuat kembali data lama sebelum delay 500ms usai.
             localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
             
             initApp();
@@ -1223,9 +1346,12 @@
             } else if (type === 'error') {
                 iconContainer.className = "w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl shadow-inner";
                 iconContainer.innerHTML = '<i class="fa-solid fa-scale-unbalanced-flip"></i>';
+            } else if (type === 'success') {
+                iconContainer.className = "w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl shadow-inner";
+                iconContainer.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
             } else {
                 iconContainer.className = "w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl shadow-inner";
-                iconContainer.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+                iconContainer.innerHTML = '<i class="fa-solid fa-circle-info"></i>';
             }
 
             if (listItems && listItems.length > 0) {
@@ -1323,28 +1449,39 @@
                 document.getElementById('finishing-empty').classList.remove('hidden');
                 document.getElementById('finishing-empty').querySelector('p').innerText = "Eksekusi ditangguhkan karena terdapat tanggal yang belum balance pada rentang waktu ini.";
                 tbody.parentNode.classList.add('hidden');
-                document.getElementById('finishing-grand-qty').innerText = "0 Pcs";
+                document.getElementById('finishing-grand-qty').innerText = "0 Pcs Item Terjual";
                 document.getElementById('finishing-grand-price').innerText = "Rp 0";
+                document.getElementById('finishing-total-diskon').innerText = "Rp 0";
+                document.getElementById('finishing-total-diskon-rincian').innerText = "Mak: Rp 0 | Min: Rp 0";
+                document.getElementById('discount-rincian-periode').innerHTML = "Total Diskon Makanan: Rp 0 &nbsp;|&nbsp; Total Diskon Minuman: Rp 0";
+                document.getElementById('finishing-net-price').innerText = "Rp 0";
+                document.getElementById('finishing-net-warning').classList.add('hidden');
+                document.getElementById('finishing-net-normal-text').classList.remove('hidden');
                 return;
             }
 
             document.getElementById('finishing-empty').querySelector('p').innerText = "Tidak ada data penjualan pada rentang periode dan filter kategori tersebut.";
 
             const selectedCategories = [];
-            if (document.getElementById('cat-makanan').checked) selectedCategories.push('Makanan');
-            if (document.getElementById('cat-minuman').checked) selectedCategories.push('Minuman');
-            if (document.getElementById('cat-makanan-ol').checked) selectedCategories.push('Makanan Online');
-            if (document.getElementById('cat-minuman-ol').checked) selectedCategories.push('Minuman Online');
-            if (document.getElementById('cat-lainlain').checked) selectedCategories.push('Lain-lain');
+            
+            const mChecked = document.getElementById('cat-makanan').checked;
+            const moChecked = document.getElementById('cat-makanan-ol').checked;
+            const minChecked = document.getElementById('cat-minuman').checked;
+            const minoChecked = document.getElementById('cat-minuman-ol').checked;
+            const lainChecked = document.getElementById('cat-lainlain').checked;
+
+            if (mChecked) selectedCategories.push('Makanan');
+            if (minChecked) selectedCategories.push('Minuman');
+            if (moChecked) selectedCategories.push('Makanan Online');
+            if (minoChecked) selectedCategories.push('Minuman Online');
+            if (lainChecked) selectedCategories.push('Lain-lain');
 
             const searchKeyword = document.getElementById('finish-search').value.toLowerCase();
-
             let periodTotals = {};
             
             Object.keys(appState.records).forEach(dateStr => {
                 if (dateStr >= fromDate && dateStr <= toDate) {
                     const rec = appState.records[dateStr];
-                    
                     ['pagi', 'siang'].forEach(shift => {
                         if (rec[shift]) {
                             Object.keys(rec[shift]).forEach(itemId => {
@@ -1383,7 +1520,6 @@
                     if (isOnline) badgeClass = 'bg-emerald-100 text-emerald-800';
                     else if (product.category === 'Lain-lain') badgeClass = 'bg-purple-100 text-purple-800';
 
-                    // BARIS ITEM DIBUAT CLICKABLE UNTUK MEMBUKA BREAKDOWN PER TANGGAL
                     const row = document.createElement('tr');
                     row.className = "hover:bg-indigo-50/70 border-b border-gray-100 last:border-0 transition cursor-pointer group";
                     row.title = `Klik untuk mem-breakdown riwayat tanggal jual: ${product.name}`;
@@ -1405,8 +1541,144 @@
                 }
             });
 
-            document.getElementById('finishing-grand-qty').innerText = `${grandQty.toLocaleString('id-ID')} Pcs`;
+            // ====== Logika Manajemen Filtering Diskon (Makanan & Minuman) ======
+            let includeFoodDiscount = false;
+            let foodWarning = null;
+            if (mChecked && moChecked) {
+                includeFoodDiscount = true; // Keduanya ter-checklist, diskon Makanan full valid
+            } else if (!mChecked && !moChecked) {
+                includeFoodDiscount = false; // Keduanya dimatikan, abaikan semua diskon Makanan
+            } else {
+                includeFoodDiscount = true; // Salah satu mati, tetap hitung diskon Makanan namun beri warning
+                foodWarning = !mChecked ? 'Makanan' : 'Mak. Online';
+            }
+
+            let includeDrinkDiscount = false;
+            let drinkWarning = null;
+            if (minChecked && minoChecked) {
+                includeDrinkDiscount = true;
+            } else if (!minChecked && !minoChecked) {
+                includeDrinkDiscount = false;
+            } else {
+                includeDrinkDiscount = true;
+                drinkWarning = !minChecked ? 'Minuman' : 'Min. Online';
+            }
+
+            let totalDiskonMakPeriode = 0;
+            let totalDiskonMinPeriode = 0;
+            let totalDiskonPeriode = 0;
+            let discountDatesList = [];
+
+            const dates = Object.keys(appState.records).filter(d => d >= fromDate && d <= toDate).sort();
+            dates.forEach(dateStr => {
+                const rec = appState.records[dateStr];
+                if (rec && rec.general) {
+                    const genP = rec.general.pagi || {};
+                    const genS = rec.general.siang || {};
+                    
+                    let diskonMakPagi = genP.diskonMakanan || 0;
+                    let diskonMakSiang = genS.diskonMakanan || 0;
+                    let diskonMinPagi = genP.diskonMinuman || 0;
+                    let diskonMinSiang = genS.diskonMinuman || 0;
+
+                    // Meng-nol-kan (0) perhitungan diskon jika kategorinya dimatikan total
+                    if (!includeFoodDiscount) {
+                        diskonMakPagi = 0;
+                        diskonMakSiang = 0;
+                    }
+                    if (!includeDrinkDiscount) {
+                        diskonMinPagi = 0;
+                        diskonMinSiang = 0;
+                    }
+
+                    const totalMakHariIni = diskonMakPagi + diskonMakSiang;
+                    const totalMinHariIni = diskonMinPagi + diskonMinSiang;
+                    const totalHariIni = totalMakHariIni + totalMinHariIni;
+
+                    if (totalHariIni > 0) {
+                        totalDiskonMakPeriode += totalMakHariIni;
+                        totalDiskonMinPeriode += totalMinHariIni;
+                        totalDiskonPeriode += totalHariIni;
+
+                        discountDatesList.push({
+                            date: dateStr,
+                            diskonMakPagi, diskonMinPagi,
+                            diskonMakSiang, diskonMinSiang,
+                            total: totalHariIni
+                        });
+                    }
+                }
+            });
+
+            const netPenjualan = grandPrice - totalDiskonPeriode;
+
+            // Updating Rincian Harga UI Boxes
+            document.getElementById('finishing-grand-qty').innerText = `${grandQty.toLocaleString('id-ID')} Pcs Item Terjual`;
             document.getElementById('finishing-grand-price').innerText = formatRupiah(grandPrice);
+            
+            document.getElementById('finishing-total-diskon').innerText = formatRupiah(totalDiskonPeriode);
+            document.getElementById('finishing-total-diskon-rincian').innerText = `Mak: ${formatRupiah(totalDiskonMakPeriode)} | Min: ${formatRupiah(totalDiskonMinPeriode)}`;
+            document.getElementById('finishing-net-price').innerText = formatRupiah(netPenjualan);
+
+            // Handler Box Warning Kuning
+            let warnings = [];
+            if (foodWarning) warnings.push(foodWarning);
+            if (drinkWarning) warnings.push(drinkWarning);
+
+            const warningEl = document.getElementById('finishing-net-warning');
+            const warningText = document.getElementById('finishing-net-warning-text');
+            const normalNetText = document.getElementById('finishing-net-normal-text');
+            
+            if (warnings.length > 0) {
+                warningText.innerText = warnings.join(' & ');
+                warningEl.classList.remove('hidden');
+                normalNetText.classList.add('hidden');
+            } else {
+                warningEl.classList.add('hidden');
+                normalNetText.classList.remove('hidden');
+            }
+
+            // Updating Dropdown Rincian Teks
+            document.getElementById('discount-rincian-periode').innerHTML = `Total Diskon Makanan: <b class="text-red-700">${formatRupiah(totalDiskonMakPeriode)}</b> &nbsp;|&nbsp; Total Diskon Minuman: <b class="text-red-700">${formatRupiah(totalDiskonMinPeriode)}</b>`;
+
+            const noDiskonMsg = document.getElementById('no-discount-msg');
+            const diskonListItems = document.getElementById('discount-list-items');
+            const diskonBadge = document.getElementById('discount-count-badge');
+            
+            diskonBadge.innerText = `${discountDatesList.length} Hari`;
+
+            if (discountDatesList.length === 0) {
+                noDiskonMsg.classList.remove('hidden');
+                diskonListItems.classList.add('hidden');
+                diskonListItems.innerHTML = '';
+            } else {
+                noDiskonMsg.classList.add('hidden');
+                diskonListItems.classList.remove('hidden');
+                diskonListItems.innerHTML = '';
+
+                discountDatesList.forEach(item => {
+                    const dateFormatted = formatDateIndo(item.date);
+                    let rincianArr = [];
+                    if (item.diskonMakPagi > 0) rincianArr.push(`Mak. Pagi: ${formatRupiah(item.diskonMakPagi)}`);
+                    if (item.diskonMinPagi > 0) rincianArr.push(`Min. Pagi: ${formatRupiah(item.diskonMinPagi)}`);
+                    if (item.diskonMakSiang > 0) rincianArr.push(`Mak. Siang: ${formatRupiah(item.diskonMakSiang)}`);
+                    if (item.diskonMinSiang > 0) rincianArr.push(`Min. Siang: ${formatRupiah(item.diskonMinSiang)}`);
+
+                    const div = document.createElement('div');
+                    div.className = "flex flex-col sm:flex-row sm:items-center justify-between bg-white p-2.5 rounded-lg border border-red-200 shadow-sm";
+                    div.innerHTML = `
+                        <div class="flex items-center gap-2 font-semibold text-gray-800">
+                            <i class="fa-regular fa-calendar-days text-red-500"></i>
+                            <span>${dateFormatted}</span>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2 mt-1 sm:mt-0 text-[11px]">
+                            <span class="text-gray-500 font-medium">(${rincianArr.join(' | ')})</span>
+                            <span class="font-black text-red-700 bg-red-100 px-2 py-0.5 rounded border border-red-300">Potongan: ${formatRupiah(item.total)}</span>
+                        </div>
+                    `;
+                    diskonListItems.appendChild(div);
+                });
+            }
 
             if (countRendered === 0) {
                 emptyEl.classList.remove('hidden');
@@ -1417,7 +1689,18 @@
             }
         }
 
-        // --- FUNGSI FORMAT TANGGAL INDONESIA ---
+        function toggleDiscountList() {
+            const container = document.getElementById('discount-list-container');
+            const icon = document.getElementById('discount-toggle-icon');
+            if (container.classList.contains('hidden')) {
+                container.classList.remove('hidden');
+                icon.classList.add('rotate-180');
+            } else {
+                container.classList.add('hidden');
+                icon.classList.remove('rotate-180');
+            }
+        }
+
         function formatDateIndo(dateStr) {
             if (!dateStr) return '-';
             const parts = dateStr.split('-');
@@ -1426,7 +1709,6 @@
             return `${parts[2]} ${months[parseInt(parts[1]) - 1]} ${parts[0]}`;
         }
 
-        // --- FUNGSI BARU: MENAMPILKAN BREAKDOWN PENJUALAN PER ITEM ---
         function showItemBreakdown(itemId, fromDate, toDate) {
             const product = appState.catalog.find(p => p.id === itemId);
             if (!product) return;
@@ -1442,7 +1724,6 @@
             let totalPrice = 0;
             let count = 0;
 
-            // Ambil semua tanggal dalam rentang periode dan urutkan
             const dates = Object.keys(appState.records).filter(d => d >= fromDate && d <= toDate).sort();
 
             dates.forEach(dateStr => {
